@@ -11,10 +11,10 @@ import Control.Monad.IO.Class (MonadIO (..))
 import DB
   ( Products (..),
     createProduct,
+    deleteProduct,
     getProduct,
     getProducts,
     updateProduct,
-    deleteProduct
   )
 import Data.Proxy (Proxy (..))
 import Database.Esqueleto.Experimental
@@ -32,7 +32,7 @@ import GHC.Generics
 import Network.Wai.Handler.Warp (run)
 import Network.Wai.Middleware.Cors (simpleCors)
 import Servant (JSON, errBody)
-import Servant.API (Capture, Get, Post, ReqBody, type (:<|>) ((:<|>)), type (:>), Patch, Delete)
+import Servant.API (Capture, Delete, Get, Patch, Post, ReqBody, type (:<|>) ((:<|>)), type (:>))
 import Servant.Server (Handler, Server, err404, err500, serve)
 
 type ProductsAPI =
@@ -79,10 +79,10 @@ apiUpdateProduct :: ConnectionPool -> Integer -> Product -> Handler ()
 apiUpdateProduct pool pid prod = liftIO $
   flip runSqlPersistMPool pool $ do
     updateProduct
-            (fromIntegral $ productId prod)
-            (productName prod)
-            (productDescription prod)
-            (fromIntegral $ productInStock prod)
+      (fromIntegral $ productId prod)
+      (productName prod)
+      (productDescription prod)
+      (fromIntegral $ productInStock prod)
 
 apiDeleteProduct :: ConnectionPool -> Integer -> Handler ()
 apiDeleteProduct pool pid = liftIO $
