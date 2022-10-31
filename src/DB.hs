@@ -66,6 +66,7 @@ share
       name String
       description String
       inStock Int
+      priceMinorUnits Int
       UniqueProduct name 
       deriving Eq Show
   |]
@@ -87,10 +88,10 @@ deleteProduct pid = do
     prod <- from $ table @Products
     where_ (prod ^. ProductsId ==. valkey (fromIntegral pid))
 
-updateProduct :: (MonadIO m, MonadLogger m) => Integer -> String -> String -> Integer -> SqlPersistT m ()
-updateProduct pid name descr count = do
+updateProduct :: (MonadIO m, MonadLogger m) => Integer -> String -> String -> Integer -> Integer -> SqlPersistT m ()
+updateProduct pid name descr count price = do
   update $ \p -> do
-    set p [ProductsName =. val name, ProductsDescription =. val descr, ProductsInStock =. val (fromIntegral count)]
+    set p [ProductsName =. val name, ProductsDescription =. val descr, ProductsInStock =. val (fromIntegral count), ProductsPriceMinorUnits =. val (fromIntegral price)]
     where_ (p ^. ProductsId ==. valkey (fromIntegral pid))
 
 createProduct :: (MonadIO m, MonadLogger m) => Products -> SqlPersistT m (Maybe (Entity Products))

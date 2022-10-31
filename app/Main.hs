@@ -19,5 +19,7 @@ main = do
   -- _ <- createProduct $ Products "P4" "Tralala" 3
   --pure ()
 
+  runSqlite "db.db" $ do
+    runMigration migrateAll
   pool <- runStdoutLoggingT $ createSqlitePool "db.db" 4
   liftIO $ runAPI pool 8888

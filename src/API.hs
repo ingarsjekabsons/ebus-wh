@@ -83,6 +83,7 @@ apiUpdateProduct pool pid prod = liftIO $
       (productName prod)
       (productDescription prod)
       (fromIntegral $ productInStock prod)
+      (fromIntegral $ productPriceMinorUnits prod)
 
 apiDeleteProduct :: ConnectionPool -> Integer -> Handler ()
 apiDeleteProduct pool pid = liftIO $
@@ -93,7 +94,8 @@ data Product = Product
   { productId :: Int,
     productName :: String,
     productDescription :: String,
-    productInStock :: Int
+    productInStock :: Int,
+    productPriceMinorUnits :: Int
   }
   deriving stock (Ord, Eq, Generic)
   deriving (ToJSON) via PrefixedSnake "product" Product
@@ -107,6 +109,7 @@ prodToDTO p =
         (productsName p')
         (productsDescription p')
         (productsInStock p')
+        (productsPriceMinorUnits  p')
 
 prodFromDTO :: Product -> Products
 prodFromDTO p =
@@ -114,3 +117,4 @@ prodFromDTO p =
     (productName p)
     (productDescription p)
     (productInStock p)
+    (productPriceMinorUnits p)
