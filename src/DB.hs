@@ -48,6 +48,7 @@ import Database.Esqueleto.Experimental
     (=.),
     (==.),
     (^.),
+    (||.),
   )
 import Database.Esqueleto.Experimental.From (table)
 import Database.Persist.TH
@@ -71,9 +72,12 @@ share
       deriving Eq Show
   |]
 
-getProducts :: (MonadIO m, MonadLogger m) => SqlPersistT m [Entity Products]
-getProducts = do
-  select $ from $ table @Products
+getProducts :: (MonadIO m, MonadLogger m) => String -> SqlPersistT m [Entity Products]
+getProducts name = do
+  select $ do
+    prod <- from $ table @Products
+    where_ (prod ^. ProductsName ==. val name ||. val name ==. val "-")
+    return prod
 
 getProduct :: (MonadIO m, MonadLogger m) => Integer -> SqlPersistT m (Maybe (Entity Products))
 getProduct pid = do

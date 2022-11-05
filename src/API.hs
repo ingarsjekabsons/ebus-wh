@@ -16,6 +16,7 @@ import DB
     getProducts,
     updateProduct,
   )
+import Data.Maybe (fromMaybe)
 import Data.Proxy (Proxy (..))
 import Database.Esqueleto.Experimental
   ( ConnectionPool,
@@ -32,11 +33,11 @@ import GHC.Generics
 import Network.Wai.Handler.Warp (run)
 import Network.Wai.Middleware.Cors (simpleCors)
 import Servant (JSON, errBody)
-import Servant.API (Capture, Delete, Get, Patch, Post, ReqBody, type (:<|>) ((:<|>)), type (:>))
+import Servant.API (Capture, Delete, Get, Patch, Post, QueryParam, ReqBody, type (:<|>) ((:<|>)), type (:>))
 import Servant.Server (Handler, Server, err404, err500, serve)
 
 type ProductsAPI =
-  "products" :> Get '[JSON] [Product]
+  "products" :> QueryParam "name" String :> Get '[JSON] [Product]
     :<|> "products" :> Capture "productId" Integer :> Get '[JSON] Product
     :<|> "products" :> ReqBody '[JSON] Product :> Post '[JSON] Product
     :<|> "products" :> Capture "productId" Integer :> ReqBody '[JSON] Product :> Patch '[JSON] ()
@@ -56,8 +57,9 @@ server pool =
 runAPI :: ConnectionPool -> Int -> IO ()
 runAPI pool port = run port (simpleCors $ serve productsAPI $ server pool)
 
-apiGetProducts :: ConnectionPool -> Handler [Product]
-apiGetProducts p = liftIO $ (fmap . fmap) prodToDTO $ flip runSqlPersistMPool p $ do getProducts
+apiGetProducts :: ConnectionPool -> Maybe String -> Handler [Product]
+apiGetProducts p name = do
+  liftIO $ (fmap . fmap) prodToDTO $ flip runSqlPersistMPool p $ do getProducts (fromMaybe "-" name)
 
 apiGetProduct :: ConnectionPool -> Integer -> Handler Product
 apiGetProduct p i = liftIO $
@@ -109,7 +111,7 @@ prodToDTO p =
         (productsName p')
         (productsDescription p')
         (productsInStock p')
-        (productsPriceMinorUnits  p')
+        (productsPriceMinorUnits p')
 
 prodFromDTO :: Product -> Products
 prodFromDTO p =
