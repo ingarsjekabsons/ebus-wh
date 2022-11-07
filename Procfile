@@ -1,1 +1,1 @@
-web: ./dist/build/wh/wh
+web: wh
