@@ -1,0 +1,12 @@
+{
+  "name": "WH UI",
+  "version": "1.0.0",
+  "description": "WH UI",
+  "scripts": {
+    "start": "serve",
+  },
+  "dependencies": {
+    "serve": "^10.0.1"
+  },
+  "author": ""
+}
