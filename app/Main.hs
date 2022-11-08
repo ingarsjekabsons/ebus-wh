@@ -9,6 +9,7 @@ import DB (Products (..), createProduct, getProducts, migrateAll)
 import Database.Esqueleto.Experimental (runMigration)
 import Database.Persist.Sqlite (createSqlitePool, runSqlite)
 
+import System.Environment (getEnv)
 main :: IO ()
 main = do
   --runStderrLoggingT $ runSqlite "db.db" $ do
@@ -22,4 +23,5 @@ main = do
   runSqlite "db.db" $ do
     runMigration migrateAll
   pool <- runStdoutLoggingT $ createSqlitePool "db.db" 4
-  liftIO $ runAPI pool 8888
+  port <- getEnv "PORT"
+  liftIO $ runAPI pool (read port)
